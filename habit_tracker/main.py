@@ -4,7 +4,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) # برای مشخص کردن مسیر ایمپورت
 from habit_tracker.utils.file_handler import FileHandler
 from habit_tracker.models.tracker import HabitTracker # کلاس HabitTracker رو ایمپورت میکنیم 
-from habit_tracker.utils.iterators import completed_dates_generator
+from habit_tracker.utils.decorators import log_execution # جنریتور
 
 TRANSLATIONS = {
     'en': {
@@ -80,6 +80,8 @@ class HabitTrackerApp: #این کلاس رابط CLI پروژه است
     def t(self, key, *args):# با توجه به زبان جاری متن مناسب رو از دیکشنری ترجمه بر میگردونه
         return TRANSLATIONS[self.language]['prompts'][key].format(*args)
 
+
+    @log_execution
     def display_menu(self):#این تابع مسئول چاپ منوی اصلی CLI برای کاربره — به زبان انتخاب‌شده (انگلیسی یا فارسی)
         print("\n" + "=" * 30)#چاپ خط جدا کننده در منو 
         print(TRANSLATIONS[self.language]['menu_title'])#عنوان منو
@@ -97,6 +99,7 @@ class HabitTrackerApp: #این کلاس رابط CLI پروژه است
         else:
             print("Invalid choice! Keeping current language.")
 
+    @log_execution
     def run(self):
         while True:#انتخواب اولیه زبان در ابتدای برنامه
             print("\n🌐 Select Language | انتخاب زبان")
