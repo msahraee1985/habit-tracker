@@ -1,0 +1,9 @@
+{
+    "habits": [
+        {
+            "name": "book",
+            "frequency": "daily",
+            "completion_dates": []
+        }
+    ]
+}

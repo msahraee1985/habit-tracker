@@ -1,8 +1,9 @@
-#فایل main برنامه برای ساختن منوی cli 
+#فایل main برنامه برای ساختن منوی cli ساخت ترجه و ارتباط با فایل tracker
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from habit_tracker.models.tracker import HabitTracker
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) # برای مشخص کردن مسیر ایمپورت
+
+from habit_tracker.models.tracker import HabitTracker # کلاس HabitTracker رو ایمپورت میکنیم 
 
 TRANSLATIONS = {
     'en': {
@@ -65,26 +66,28 @@ TRANSLATIONS = {
             'edit_fail': "❌ عادت پیدا نشد یا نام جدید تکراری است."
         }
     }
-}
+} # برای خلاقیت بیشتر منو رو دو زبانه کردم و اینجا یک دیکشنری درست کردم که تایتل های منو ها و پرامپت های منو رو بتونم ترجمه کنم
 
-class HabitTrackerApp:
+
+class HabitTrackerApp: #این کلاس رابط CLI پروژه است
     def __init__(self):
-        self.tracker = HabitTracker()
-        self.language = 'en'
+        self.tracker = HabitTracker() # یک شیئ از کلاس HabitTracker رو میدیم به کلاس habittrackerapp
+    
+        self.language = 'en' #cزبان پیش فرض منو رو انگلیسی قرار میدیم
 
-    def t(self, key, *args):
+    def t(self, key, *args):# با توجه به زبان جاری متن مناسب رو از دیکشنری ترجمه بر میگردونه
         return TRANSLATIONS[self.language]['prompts'][key].format(*args)
 
-    def display_menu(self):
-        print("\n" + "=" * 30)
-        print(TRANSLATIONS[self.language]['menu_title'])
-        print("=" * 30)
+    def display_menu(self):#این تابع مسئول چاپ منوی اصلی CLI برای کاربره — به زبان انتخاب‌شده (انگلیسی یا فارسی)
+        print("\n" + "=" * 30)#چاپ خط جدا کننده در منو 
+        print(TRANSLATIONS[self.language]['menu_title'])#عنوان منو
+        print("=" * 30)#خط خالی
         for i, option in enumerate(TRANSLATIONS[self.language]['options'], 1):
-            print(f"{i}. {option}")
+            print(f"{i}. {option}") # پرینت گزینه های منو با کلاس enumerate خود پایتون
 
-    def change_language(self):
+    def change_language(self):#متد انتخاب زبان
         print("\n1. English\n2. فارسی")
-        choice = input("Select language: ").strip()
+        choice = input("Select language: ").strip()# برای حذف کاراکترهای اظافه
         if choice == "1":
             self.language = 'en'
         elif choice == "2":
@@ -93,7 +96,7 @@ class HabitTrackerApp:
             print("Invalid choice! Keeping current language.")
 
     def run(self):
-        while True:
+        while True:#انتخواب اولیه زبان در ابتدای برنامه
             print("\n🌐 Select Language | انتخاب زبان")
             print("1. English")
             print("2. فارسی")
@@ -107,69 +110,69 @@ class HabitTrackerApp:
             else:
                 print("❌ Invalid choice! / گزینه نامعتبر!")
 
-        while True:
-            self.display_menu()
-            choice = input(self.t('select_option')).strip()
+        while True:# منوی اصلی 
+            self.display_menu() #تابع چاپ گزینه های منو
+            choice = input(self.t('select_option')).strip() # گرفتن انتخاب کاربر 
 
-            if choice == "1":
-                name = input(self.t('habit_name')).strip()
-                freq = input(self.t('frequency')).strip().lower()
-                if freq in ("daily", "weekly", "روزانه", "هفتگی"):
-                    freq = "daily" if freq in ("daily", "روزانه") else "weekly"
-                    try:
-                        self.tracker.add_habit(name, freq)
+            if choice == "1":# اگر کاربر گزینه 1 رو انتخاب کنه
+                name = input(self.t('habit_name')).strip() # نام عادت رو ازش می گیریم
+                freq = input(self.t('frequency')).strip().lower() # فرکانس عادت رو ازش می گیریم
+                if freq in ("daily", "weekly", "روزانه", "هفتگی"): #فرکانس گرفته شده رو اعتبار سنجی میکنیم 
+                    freq = "daily" if freq in ("daily", "روزانه") else "weekly" #فرکانس رو مقدار دهی میکنیم فقط به انگلیسی
+                    try:#اکسپشن ولیو ارور رو هندل میکنیم
+                        self.tracker.add_habit(name, freq) # از کلاس HabitTracker متد add_habit() رو صدا میزنیم
                         print(self.t('habit_added', name))
                     except ValueError as e:
                         print(self.t('error', str(e)))
-                else:
+                else:# اگر فرکانس مورد نظر نبود
                     print(self.t('invalid_frequency'))
 
-            elif choice == "2":
-                name = input(self.t('habit_name')).strip()
-                habit = self.tracker.get_habit(name)
+            elif choice == "2":#مارک زدن انجام یک عادت 
+                name = input(self.t('habit_name')).strip() #نام عادتی که می خوایم مارک بزنیم رو از کاربر می گیره 
+                habit = self.tracker.get_habit(name)# از متد گت هبیت تلاش میکنه اون عادت رو پیدا کنه 
                 if habit:
-                    habit.mark_completed()
+                    habit.mark_completed()# اگر پیدا کرد متد مارک کامپلیتد رو صدا میزنه
                     print(self.t('mark_success', name))
-                else:
+                else:# اگر پیدا نکرد پیام خطا میده 
                     print(self.t('mark_failed', name))
 
-            elif choice == "3":
-                habits = self.tracker.get_all_habits()
-                if not habits:
+            elif choice == "3":#گزینه دیدن تمام عادت های ثبت شده 
+                habits = self.tracker.get_all_habits() # صدا زدن متد گت آل هبیت از هبیت ترکر
+                if not habits:#اگر هبیت خالی بود
                     print(self.t('no_habits'))
-                for habit in habits:
-                    streaks = habit.calculate_streaks()
+                for habit in habits: #
+                    streaks = habit.calculate_streaks() # از کلاس habit یک دیکشنری شامل استریک فعلی و بلندترین استریک می فرسته
                     print(f"- {habit.name} ({habit.frequency}) | Current: {streaks['current_streak']} 🔁 | Max: {streaks['longest_streak']} 🏆")
-
-            elif choice == "4":
+                    # نام هبیت و تکرار و بیشترین تکرار رو چاپ میکنه
+            elif choice == "4":# ویرایش نام عادت
                 old_name = input(self.t('edit_old')).strip()
                 new_name = input(self.t('edit_new')).strip()
                 try:
-                    success = self.tracker.edit_habit(old_name, new_name)
-                    if success:
+                    success = self.tracker.edit_habit(old_name, new_name) #متد ادیت هبیت رو از هبیت تراکرز فراخوانی میکنیم
+                    if success: # اگر مقدار success true برگرده
                         print(self.t('edit_success', new_name))
                     else:
                         print(self.t('edit_fail'))
-                except ValueError:
+                except ValueError: #هندل کردن value error
                     print(self.t('edit_fail'))
 
-            elif choice == "5":
-                name = input(self.t('habit_name')).strip()
-                if self.tracker.remove_habit(name):
+            elif choice == "5":# پاک کردن عادت 
+                name = input(self.t('habit_name')).strip()# اسم عادت رو از کاربر میگیریم 
+                if self.tracker.remove_habit(name): # تابع remove_habit رو کال میکنیم 
                     print(self.t('habit_deleted', name))
                 else:
                     print(self.t('not_found'))
 
-            elif choice == "6":
+            elif choice == "6": # تابع تغییر زبان رو که قبلن ساختیم کال میکنیم 
                 self.change_language()
 
-            elif choice == "7":
+            elif choice == "7":# برای خروج از حلقه اصلی برنامه و چون از while True استفاده کردیم دیگه نیازی نیست از exite استفاده کنیم
                 print(self.t('goodbye'))
                 break
 
             else:
                 print("❌ Invalid choice!")
 
-if __name__ == "__main__":
+if __name__ == "__main__":# همون عبارتی که تو دوره آموزش دادید که در صورتی که در فایل اصلی هستیم برنامه اجرا بشه
     app = HabitTrackerApp()
     app.run()
