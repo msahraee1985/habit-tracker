@@ -9,8 +9,8 @@ class Habit:  #تعریف کلاس اصلی عادت
         self.completion_dates: List[date] = [] # ایجاد یک لیست برای جمع آوری تاریخ هایی که عر عادت انجام میشه
 
         if self.frequency not in ('daily', 'weekly'):
-            raise ValueError("Frequency must be either 'daily' or 'weekly'")
-# پرتاب خطا در صورت رعایت نکردن فرمت فرکانس
+            raise ValueError("Frequency must be either 'daily' or 'weekly'")# پرتاب خطا در صورت رعایت نکردن فرمت فرکانس
+                               
     def mark_completed(self, completion_date: date = date.today()) -> None: #تعریف متد برای اختصاص تاریخ به انجام شدن یک عادت
 
         if completion_date not in self.completion_dates:

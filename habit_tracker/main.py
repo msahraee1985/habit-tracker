@@ -2,8 +2,9 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) # برای مشخص کردن مسیر ایمپورت
-
+from habit_tracker.utils.file_handler import FileHandler
 from habit_tracker.models.tracker import HabitTracker # کلاس HabitTracker رو ایمپورت میکنیم 
+from habit_tracker.utils.iterators import completed_dates_generator
 
 TRANSLATIONS = {
     'en': {
@@ -72,9 +73,10 @@ TRANSLATIONS = {
 class HabitTrackerApp: #این کلاس رابط CLI پروژه است
     def __init__(self):
         self.tracker = HabitTracker() # یک شیئ از کلاس HabitTracker رو میدیم به کلاس habittrackerapp
-    
+        self.file_handler = FileHandler()# ایجاد شیء برای مدیریت فایل JSON
+        self.tracker.habits = self.file_handler.load_data()# بارگذاری اطلاعات از فایل هنگام شروع برنامه
         self.language = 'en' #cزبان پیش فرض منو رو انگلیسی قرار میدیم
-
+        
     def t(self, key, *args):# با توجه به زبان جاری متن مناسب رو از دیکشنری ترجمه بر میگردونه
         return TRANSLATIONS[self.language]['prompts'][key].format(*args)
 
@@ -121,6 +123,7 @@ class HabitTrackerApp: #این کلاس رابط CLI پروژه است
                     freq = "daily" if freq in ("daily", "روزانه") else "weekly" #فرکانس رو مقدار دهی میکنیم فقط به انگلیسی
                     try:#اکسپشن ولیو ارور رو هندل میکنیم
                         self.tracker.add_habit(name, freq) # از کلاس HabitTracker متد add_habit() رو صدا میزنیم
+                        self.file_handler.save_data(self.tracker.habits)  # ذخیره تغییرات بعد از افزودن عادت
                         print(self.t('habit_added', name))
                     except ValueError as e:
                         print(self.t('error', str(e)))
@@ -132,6 +135,7 @@ class HabitTrackerApp: #این کلاس رابط CLI پروژه است
                 habit = self.tracker.get_habit(name)# از متد گت هبیت تلاش میکنه اون عادت رو پیدا کنه 
                 if habit:
                     habit.mark_completed()# اگر پیدا کرد متد مارک کامپلیتد رو صدا میزنه
+                    self.file_handler.save_data(self.tracker.habits)  # ذخیره تغییرات بعد از ثبت انجام عادت
                     print(self.t('mark_success', name))
                 else:# اگر پیدا نکرد پیام خطا میده 
                     print(self.t('mark_failed', name))
@@ -150,6 +154,7 @@ class HabitTrackerApp: #این کلاس رابط CLI پروژه است
                 try:
                     success = self.tracker.edit_habit(old_name, new_name) #متد ادیت هبیت رو از هبیت تراکرز فراخوانی میکنیم
                     if success: # اگر مقدار success true برگرده
+                        self.file_handler.save_data(self.tracker.habits)  # ذخیره تغییرات بعد از ویرایش عادت
                         print(self.t('edit_success', new_name))
                     else:
                         print(self.t('edit_fail'))
@@ -159,6 +164,8 @@ class HabitTrackerApp: #این کلاس رابط CLI پروژه است
             elif choice == "5":# پاک کردن عادت 
                 name = input(self.t('habit_name')).strip()# اسم عادت رو از کاربر میگیریم 
                 if self.tracker.remove_habit(name): # تابع remove_habit رو کال میکنیم 
+                    self.file_handler.save_data(self.tracker.habits)  # ذخیره تغییرات بعد از حذف عادت
+
                     print(self.t('habit_deleted', name))
                 else:
                     print(self.t('not_found'))
