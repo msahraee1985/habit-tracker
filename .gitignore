@@ -1,0 +1,38 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+ENV/
+env/
+
+# VS Code settings
+.vscode/
+
+# Coverage cache but NOT main report
+.pytest_cache/
+.cache/
+.tox/
+.nox/
+
+# Ignore Python package build stuff
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Logs, swap, temp
+*.log
+*.tmp
+*.swp
+
+# Mac system files
+.DS_Store
+
+# Don't ignore these (they ARE needed)
+!habit_tracker/tests/test_tracker.py
+!.coverage
+!htmlcov/
