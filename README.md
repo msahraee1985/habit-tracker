@@ -67,3 +67,5 @@ Coverage tracking with coverage.py
 🎓 Author
 👑 Mehrdad ranjbar (Project Lead)
 🤖 Assistant: ChatGPT (coding partner & coffee-powered co-pilot) 😄
+## 🖼 Demo Screenshot
+
